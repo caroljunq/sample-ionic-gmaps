@@ -21,7 +21,7 @@
     <p>Please connect to the Internet...</p>
   </div>
 
-  <ion-list>
+  <ion-list *ngIf="traceRoute">
     <ion-toolbar>
       <ion-searchbar [(ngModel)]="queries.originPosition" (ionInput)="searchPlace('originPosition')" (touchstart)="clearSearchBar('originPosition')"></ion-searchbar>
     </ion-toolbar>
@@ -36,7 +36,7 @@
       <ion-item class="place-result" *ngFor="let place of places.destinationPosition" (touchstart)="selectPlace(place,'destinationPosition')">{{place.description}}</ion-item>
     </ion-list>
     <div padding>
-      <button ion-button (click)="calculateRoute()">Traçar rota</button>
+      <button ion-button (click)="displayDirection()">Traçar rota</button>
     </div>
   </ion-list>
 

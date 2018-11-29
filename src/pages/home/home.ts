@@ -43,6 +43,12 @@ export class HomePage {
     destinationPosition: ''
   };
 
+  coords_info: any = {
+    searchPosition: {},
+    originPosition: {},
+    destinationPosition: {}
+  };
+
   constructor(public navCtrl: NavController, public zone: NgZone, public maps: GoogleMapsProvider, public platform: Platform, public geolocation: Geolocation, public viewCtrl: ViewController) {
     this.searchDisabled = true;
     // this.saveDisabled = true;
@@ -109,6 +115,9 @@ export class HomePage {
       this.zone.run(() => {
         this.traceRoute = true;
         this.queries[option] = details.formatted_address;
+        this.coords_info[option] = details;
+        console.log(this.coords_info);
+
         location.name = details.name;
         location.lat = details.geometry.location.lat();
         location.lng = details.geometry.location.lng();
@@ -124,7 +133,6 @@ export class HomePage {
 
           this.currentMarker.setPosition(position);
         }
-
         this.location = location;
       });
     });
@@ -172,7 +180,7 @@ export class HomePage {
     this.queries[option] = '';
   }
 
-}
+
 
   // calculateRoute() {
   //
@@ -200,14 +208,19 @@ export class HomePage {
   // }
 
 
-  // displayDirection(directionsService, directionsDisplay) {
-  //   directionsService.route({
-  //     origin: new google.maps.LatLng(-21.630483, -48.794094),
-  //     destination: new google.maps.LatLng(-21.615422, -48.812365),
-  //     travelMode: 'WALKING'
-  //   }, (response, status) => {
-  //     if (status === 'OK') {
-  //       directionsDisplay.setDirections(response);
-  //     }
-  //   });
-  // }
+  displayDirection() {
+    let origin = this.coords_info.originPosition;
+    let destination = this.coords_info.destinationPosition;
+    let directionsService = this.directionsService;
+    let directionsDisplay  = this.directionsDisplay;
+    directionsService.route({
+      origin: new google.maps.LatLng(origin.geometry.location.lat(), origin.geometry.location.lng()),
+      destination: new google.maps.LatLng(destination.geometry.location.lat(), destination.geometry.location.lng()),
+      travelMode: 'WALKING'
+    }, (response, status) => {
+      if (status === 'OK') {
+        directionsDisplay.setDirections(response);
+      }
+    });
+  }
+}
