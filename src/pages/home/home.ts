@@ -19,23 +19,29 @@ export class HomePage {
   longitude: number;
   autocompleteService: any;
   placesService: any;
-  query: string = '';
-  places: any = [];
+  // query: string = '';
+  places: any = [];//parei aqui trocar que nem o objeto das queries
   searchDisabled: boolean;
-  saveDisabled: boolean;
+  // saveDisabled: boolean;
   location: any;
 
   directionsService: any;
   directionsDisplay: any;
-  // startPosition: any;
-  // originPosition: string;
-  // destinationPosition: string;
+  // originPosition: string = '';
+  // destinationPosition: string = '';
   currentPosition: any;
   currentMarker: any;
+  traceRoute: boolean = false;
+
+  queries: any = {
+    searchPosition: '',
+    originPosition: '',
+    destinationPosition: ''
+  };
 
   constructor(public navCtrl: NavController, public zone: NgZone, public maps: GoogleMapsProvider, public platform: Platform, public geolocation: Geolocation, public viewCtrl: ViewController) {
     this.searchDisabled = true;
-    this.saveDisabled = true;
+    // this.saveDisabled = true;
   }
 
   ionViewDidLoad() {
@@ -45,7 +51,6 @@ export class HomePage {
       this.autocompleteService = new google.maps.places.AutocompleteService();
       this.placesService = new google.maps.places.PlacesService(this.maps.map);
       this.searchDisabled = false;
-
 
       this.currentMarker = new google.maps.Marker({ map: this.maps.map });
 
@@ -58,14 +63,14 @@ export class HomePage {
     });
   }
 
-  searchPlace() {
-    this.saveDisabled = true;
+  searchPlace(option) {
+    // this.saveDisabled = true;
 
-    if (this.query.length > 0 && !this.searchDisabled) {
+    if (this.queries[option].length > 0 && !this.searchDisabled) {
 
       let config = {
         types: ['geocode'],
-        input: this.query
+        input: this.queries[option]
       }
 
       this.autocompleteService.getPlacePredictions(config, (predictions, status) => {
@@ -87,7 +92,7 @@ export class HomePage {
 
   }
 
-  selectPlace(place){
+  selectPlace(place, option){
     this.places = [];
 
     let location = {
@@ -98,11 +103,12 @@ export class HomePage {
 
     this.placesService.getDetails({ placeId: place.place_id }, (details) => {
       this.zone.run(() => {
-        this.query = details.formatted_address;
+        this.traceRoute = true;
+        this.queries[option] = details.formatted_address;
         location.name = details.name;
         location.lat = details.geometry.location.lat();
         location.lng = details.geometry.location.lng();
-        this.saveDisabled = false;
+        // this.saveDisabled = false;
 
         let position = new google.maps.LatLng(location.lat, location.lng);
 
@@ -155,8 +161,9 @@ export class HomePage {
       })
   }
 
-  clearSearchBar(){
-    this.query = '';
+  clearSearchBar(option){
+    this.traceRoute = false;
+    this.queries[option] = '';
   }
 
 }

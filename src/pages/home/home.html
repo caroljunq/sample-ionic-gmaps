@@ -7,28 +7,21 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <ion-navbar color="primary">
-      <ion-buttons left>
-          <button ion-button (click)="close()">Cancel</button>
-      </ion-buttons>
-      <ion-buttons right>
-          <button [disabled]="saveDisabled" ion-button (click)="save()">Save</button>
-      </ion-buttons>
-  </ion-navbar>
+  <ion-content padding>
 
   <ion-toolbar>
-    <ion-searchbar [(ngModel)]="query" (ionInput)="searchPlace()" (click)="clearSearchBar()"></ion-searchbar>
+    <ion-searchbar [(ngModel)]="queries.searchPosition" (ionInput)="searchPlace('searchPosition')" (click)="clearSearchBar('searchPosition')"></ion-searchbar>
   </ion-toolbar>
 
-  <ion-list>
-      <ion-item class="place-result" *ngFor="let place of places" (click)="selectPlace(place)">{{place.description}}</ion-item>
+  <ion-list style="position: relative;">
+    <ion-item class="place-result" *ngFor="let place of places" (click)="selectPlace(place,'searchPosition')">{{place.description}}</ion-item>
   </ion-list>
 
   <div #pleaseConnect id="please-connect">
     <p>Please connect to the Internet...</p>
   </div>
-  <ion-list>
+
+  <ion-list *ngIf="traceRoute">
     <ion-item>
       <ion-label>De onde?</ion-label>
       <ion-input type="text" [(ngModel)]="originPosition"></ion-input>
@@ -45,4 +38,5 @@
   <div #map id="map">
     <ion-spinner></ion-spinner>
   </div>
+
 </ion-content>
