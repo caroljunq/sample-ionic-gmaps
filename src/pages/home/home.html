@@ -10,26 +10,31 @@
   <ion-content padding>
 
   <ion-toolbar>
-    <ion-searchbar [(ngModel)]="queries.searchPosition" (ionInput)="searchPlace('searchPosition')" (click)="clearSearchBar('searchPosition')"></ion-searchbar>
+    <ion-searchbar [(ngModel)]="queries.searchPosition" (ionInput)="searchPlace('searchPosition')" (touchstart)="clearSearchBar('searchPosition')"></ion-searchbar>
   </ion-toolbar>
 
   <ion-list style="position: relative;">
-    <ion-item class="place-result" *ngFor="let place of places" (click)="selectPlace(place,'searchPosition')">{{place.description}}</ion-item>
+    <ion-item class="place-result" *ngFor="let place of places.searchPosition" (touchstart)="selectPlace(place,'searchPosition')">{{place.description}}</ion-item>
   </ion-list>
 
   <div #pleaseConnect id="please-connect">
     <p>Please connect to the Internet...</p>
   </div>
 
-  <ion-list *ngIf="traceRoute">
-    <ion-item>
-      <ion-label>De onde?</ion-label>
-      <ion-input type="text" [(ngModel)]="originPosition"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label>Para onde?</ion-label>
-      <ion-input type="text" [(ngModel)]="destinationPosition"></ion-input>
-    </ion-item>
+  <ion-list>
+    <ion-toolbar>
+      <ion-searchbar [(ngModel)]="queries.originPosition" (ionInput)="searchPlace('originPosition')" (touchstart)="clearSearchBar('originPosition')"></ion-searchbar>
+    </ion-toolbar>
+    <ion-list style="position: relative;">
+      <ion-item class="place-result" *ngFor="let place of places.originPosition" (touchstart)="selectPlace(place,'originPosition')">{{place.description}}</ion-item>
+    </ion-list>
+
+    <ion-toolbar>
+      <ion-searchbar [(ngModel)]="queries.destinationPosition" (ionInput)="searchPlace('destinationPosition')" (touchstart)="clearSearchBar('destinationPosition')"></ion-searchbar>
+    </ion-toolbar>
+    <ion-list style="position: relative;">
+      <ion-item class="place-result" *ngFor="let place of places.destinationPosition" (touchstart)="selectPlace(place,'destinationPosition')">{{place.description}}</ion-item>
+    </ion-list>
     <div padding>
       <button ion-button (click)="calculateRoute()">Traçar rota</button>
     </div>

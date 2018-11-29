@@ -20,7 +20,11 @@ export class HomePage {
   autocompleteService: any;
   placesService: any;
   // query: string = '';
-  places: any = [];//parei aqui trocar que nem o objeto das queries
+  places: any  = {
+    searchPosition: [],
+    originPosition:  [],
+    destinationPosition: []
+  };
   searchDisabled: boolean;
   // saveDisabled: boolean;
   location: any;
@@ -77,23 +81,23 @@ export class HomePage {
 
         if (status == google.maps.places.PlacesServiceStatus.OK && predictions) {
 
-          this.places = [];
+          this.places[option] = [];
 
           predictions.forEach((prediction) => {
-            this.places.push(prediction);
+            this.places[option].push(prediction);
           });
         }
 
       });
 
     } else {
-      this.places = [];
+      this.places[option] = [];
     }
 
   }
 
   selectPlace(place, option){
-    this.places = [];
+    this.places[option] = [];
 
     let location = {
       lat: null,
@@ -112,12 +116,14 @@ export class HomePage {
 
         let position = new google.maps.LatLng(location.lat, location.lng);
 
-        this.maps.map.setCenter({
-          lat: location.lat,
-          lng: location.lng
-        });
+        if(option == 'searchPosition'){
+          this.maps.map.setCenter({
+            lat: location.lat,
+            lng: location.lng
+          });
 
-        this.currentMarker.setPosition(position);
+          this.currentMarker.setPosition(position);
+        }
 
         this.location = location;
       });
