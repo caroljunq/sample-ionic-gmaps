@@ -3,186 +3,198 @@ import { Component, ElementRef, ViewChild, NgZone } from '@angular/core';
 import { Geolocation } from '@ionic-native/geolocation';
 import { GoogleMapsProvider } from '../../providers/google-maps/google-maps';
 
-
 declare var google;
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
+
 export class HomePage {
 
+  @ViewChild('map') mapElement: ElementRef;
+  @ViewChild('pleaseConnect') pleaseConnect: ElementRef;
 
-      @ViewChild('map') mapElement: ElementRef;
-      @ViewChild('pleaseConnect') pleaseConnect: ElementRef;
+  latitude: number;
+  longitude: number;
+  autocompleteService: any;
+  placesService: any;
+  query: string = '';
+  places: any = [];
+  searchDisabled: boolean;
+  saveDisabled: boolean;
+  location: any;
 
-      latitude: number;
-      longitude: number;
-      autocompleteService: any;
-      placesService: any;
-      query: string = '';
-      places: any = [];
-      searchDisabled: boolean;
-      saveDisabled: boolean;
-      location: any;
-      directionsService: any;
-      directionsDisplay: any;
-      map: any;
-      startPosition: any;
-      originPosition: string;
-      destinationPosition: string;
+  directionsService: any;
+  directionsDisplay: any;
+  // startPosition: any;
+  // originPosition: string;
+  // destinationPosition: string;
+  currentPosition: any;
+  currentMarker: any;
 
-      constructor(public navCtrl: NavController, public zone: NgZone, public maps: GoogleMapsProvider, public platform: Platform, public geolocation: Geolocation, public viewCtrl: ViewController) {
-          this.searchDisabled = true;
-          this.saveDisabled = true;
+  constructor(public navCtrl: NavController, public zone: NgZone, public maps: GoogleMapsProvider, public platform: Platform, public geolocation: Geolocation, public viewCtrl: ViewController) {
+    this.searchDisabled = true;
+    this.saveDisabled = true;
+  }
+
+  ionViewDidLoad() {
+
+    let mapLoaded = this.maps.init(this.mapElement.nativeElement, this.pleaseConnect.nativeElement).then(() => {
+
+      this.autocompleteService = new google.maps.places.AutocompleteService();
+      this.placesService = new google.maps.places.PlacesService(this.maps.map);
+      this.searchDisabled = false;
+
+
+      this.currentMarker = new google.maps.Marker({ map: this.maps.map });
+
+      this.showCurrentLocation();
+
+      this.directionsService = new google.maps.DirectionsService();
+      this.directionsDisplay = new google.maps.DirectionsRenderer();
+      this.directionsDisplay.setMap(this.maps.map);
+      // this.displayDirection(this.directionsService, this.directionsDisplay);
+    });
+  }
+
+  searchPlace() {
+    this.saveDisabled = true;
+
+    if (this.query.length > 0 && !this.searchDisabled) {
+
+      let config = {
+        types: ['geocode'],
+        input: this.query
       }
 
-      ionViewDidLoad(){
+      this.autocompleteService.getPlacePredictions(config, (predictions, status) => {
 
-        // this.showCurrentLocation();
-
-          let mapLoaded = this.maps.init(this.mapElement.nativeElement, this.pleaseConnect.nativeElement).then(() => {
-
-              this.autocompleteService = new google.maps.places.AutocompleteService();
-              this.placesService = new google.maps.places.PlacesService(this.maps.map);
-              this.searchDisabled = false;
-
-              this.directionsService = new google.maps.DirectionsService();
-              this.directionsDisplay = new google.maps.DirectionsRenderer();
-
-          });
-
-
-
-      }
-//
-//       showCurrentLocation(){
-//   this.geolocation.getCurrentPosition()
-//     .then((resp) => {
-//       const position = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
-//
-//       const mapOptions = {
-//         zoom: 17,
-//         center: position
-//       }
-//
-//       this.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-//
-//       const marker = new google.maps.Marker({
-//         position: position,
-//         map: this.map
-//       });
-//
-//     }).catch((error) => {
-//       console.log('Erro ao recuperar sua posição', error);
-//     });
-// }
-
-
-      selectPlace(place){
+        if (status == google.maps.places.PlacesServiceStatus.OK && predictions) {
 
           this.places = [];
 
-          let location = {
-              lat: null,
-              lng: null,
-              name: place.name
-          };
-
-          this.placesService.getDetails({placeId: place.place_id}, (details) => {
-
-              this.zone.run(() => {
-
-                  location.name = details.name;
-                  location.lat = details.geometry.location.lat();
-                  location.lng = details.geometry.location.lng();
-                  this.saveDisabled = false;
-
-                  this.maps.map.setCenter({lat: location.lat, lng: location.lng});
-
-                  this.location = location;
-
-              });
-
+          predictions.forEach((prediction) => {
+            this.places.push(prediction);
           });
+        }
 
-      }
+      });
 
-      searchPlace(){
+    } else {
+      this.places = [];
+    }
 
-          this.saveDisabled = true;
+  }
 
-          if(this.query.length > 0 && !this.searchDisabled) {
+  selectPlace(place){
+    this.places = [];
 
-              let config = {
-                  types: ['geocode'],
-                  input: this.query
-              }
-
-              this.autocompleteService.getPlacePredictions(config, (predictions, status) => {
-
-                  if(status == google.maps.places.PlacesServiceStatus.OK && predictions){
-
-                      this.places = [];
-
-                      predictions.forEach((prediction) => {
-                          this.places.push(prediction);
-                      });
-                  }
-
-              });
-
-          } else {
-              this.places = [];
-          }
-
-      }
-
-      save(){
-          this.viewCtrl.dismiss(this.location);
-      }
-
-      close(){
-          this.viewCtrl.dismiss();
-      }
-
-      // initializeMap() {
-//   this.startPosition = new google.maps.LatLng(-21.763409, -43.349034);
-//
-//   const mapOptions = {
-//     zoom: 18,
-//     center: this.startPosition,
-//     disableDefaultUI: true
-//   }
-//
-//   this.map = new google.maps.Map(document.getElementById('map'), mapOptions);
-//   this.directionsDisplay.setMap(this.map);
-//
-//   const marker = new google.maps.Marker({
-//     position: this.startPosition,
-//     map: this.map,
-//   });
-// }
-
-calculateRoute() {
-  if (this.destinationPosition && this.originPosition) {
-    const request = {
-      // Pode ser uma coordenada (LatLng), uma string ou um lugar
-      origin: this.originPosition,
-      destination: this.destinationPosition,
-      travelMode: 'WALKING'
+    let location = {
+      lat: null,
+      lng: null,
+      name: place.name
     };
 
-    this.traceRoute(this.directionsService, this.directionsDisplay, request);
+    this.placesService.getDetails({ placeId: place.place_id }, (details) => {
+      this.zone.run(() => {
+        this.query = details.formatted_address;
+        location.name = details.name;
+        location.lat = details.geometry.location.lat();
+        location.lng = details.geometry.location.lng();
+        this.saveDisabled = false;
+
+        let position = new google.maps.LatLng(location.lat, location.lng);
+
+        this.maps.map.setCenter({
+          lat: location.lat,
+          lng: location.lng
+        });
+
+        this.currentMarker.setPosition(position);
+
+        this.location = location;
+      });
+    });
   }
+
+
+
+  // save() {
+  //   this.viewCtrl.dismiss(this.location);
+  // }
+  //
+  // close() {
+  //   this.viewCtrl.dismiss();
+  // }
+
+  getCurrentPosition(){
+    return new Promise((resolve, reject) => {
+      this.geolocation.getCurrentPosition()
+        .then((resp) => {
+          this.currentPosition = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
+          resolve(resp);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
+  showCurrentLocation(){
+    this.getCurrentPosition()
+      .then((resp) =>{
+
+        let position = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
+
+        this.maps.map.setCenter(position);
+        this.maps.map.setZoom(17);
+      })
+      .catch((err) =>{
+        console.log(err);
+      })
+  }
+
+  clearSearchBar(){
+    this.query = '';
+  }
+
 }
 
-traceRoute(service: any, display: any, request: any) {
-  service.route(request, function (result, status) {
-    if (status == 'OK') {
-      display.setDirections(result);
-    }
-  });
-}
+  // calculateRoute() {
+  //
+  //   this.originPosition = new google.maps.LatLng(-21.630483, -48.794094);
+  //   this.destinationPosition = new google.maps.LatLng(-21.615422, -48.812365);
+  //
+  //   if (this.destinationPosition && this.originPosition) {
+  //     const request = {
+  //       // Pode ser uma coordenada (LatLng), uma string ou um lugar
+  //       origin: this.originPosition,
+  //       destination: this.destinationPosition,
+  //       travelMode: 'WALKING'
+  //     };
+  //
+  //     this.traceRoute(this.directionsService, this.directionsDisplay, request);
+  //   }
+  // }
+  //
+  // traceRoute(service: any, display: any, request: any) {
+  //   service.route(request, function(result, status) {
+  //     if (status == 'OK') {
+  //       display.setDirections(result);
+  //     }
+  //   });
+  // }
 
-  }
+
+  // displayDirection(directionsService, directionsDisplay) {
+  //   directionsService.route({
+  //     origin: new google.maps.LatLng(-21.630483, -48.794094),
+  //     destination: new google.maps.LatLng(-21.615422, -48.812365),
+  //     travelMode: 'WALKING'
+  //   }, (response, status) => {
+  //     if (status === 'OK') {
+  //       directionsDisplay.setDirections(response);
+  //     }
+  //   });
+  // }

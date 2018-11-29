@@ -18,32 +18,31 @@
   </ion-navbar>
 
   <ion-toolbar>
-      <ion-searchbar [(ngModel)]="query" (ionInput)="searchPlace()"></ion-searchbar>
+    <ion-searchbar [(ngModel)]="query" (ionInput)="searchPlace()" (click)="clearSearchBar()"></ion-searchbar>
   </ion-toolbar>
 
   <ion-list>
-      <ion-item *ngFor="let place of places" (click)="selectPlace(place)">{{place.description}}</ion-item>
+      <ion-item class="place-result" *ngFor="let place of places" (click)="selectPlace(place)">{{place.description}}</ion-item>
   </ion-list>
+
   <div #pleaseConnect id="please-connect">
-        <p>Please connect to the Internet...</p>
-    </div>
-    <ion-list>
+    <p>Please connect to the Internet...</p>
+  </div>
+  <ion-list>
     <ion-item>
       <ion-label>De onde?</ion-label>
       <ion-input type="text" [(ngModel)]="originPosition"></ion-input>
     </ion-item>
-
     <ion-item>
       <ion-label>Para onde?</ion-label>
       <ion-input type="text" [(ngModel)]="destinationPosition"></ion-input>
     </ion-item>
-
     <div padding>
       <button ion-button (click)="calculateRoute()">Traçar rota</button>
     </div>
   </ion-list>
 
-    <div #map id="map">
-      <ion-spinner></ion-spinner>
+  <div #map id="map">
+    <ion-spinner></ion-spinner>
   </div>
 </ion-content>
