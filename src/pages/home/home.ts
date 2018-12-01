@@ -83,24 +83,19 @@ export class HomePage {
       this.placesService = new google.maps.places.PlacesService(this.maps.map);
       this.searchDisabled = false;
 
+      this.currentMarker = new google.maps.Marker({ map: this.maps.map });
+
       this.addStaticMarkers();
-
-      this.currentPositionMarker = new google.maps.Marker({
-        map: this.maps.map,
-        icon: '/../../assets/icon/gps-marker.png'
-      });
-
       this.showCurrentLocation();
-//
-      this.currentMarker = new google.maps.Marker({
-        map: this.maps.map
-      });
 
       this.directionsService = new google.maps.DirectionsService();
       this.directionsDisplay = new google.maps.DirectionsRenderer();
       this.directionsDisplay.setMap(this.maps.map);
+      // this.displayDirection(this.directionsService, this.directionsDisplay);
     });
   }
+
+
 
   // implementa dados estáticos (marcadores)
   addStaticMarkers(){
