@@ -1,37 +1,28 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, ViewController } from 'ionic-angular';
 
 @Component({
   selector: 'page-list',
   templateUrl: 'list.html'
 })
 export class ListPage {
-  selectedItem: any;
-  icons: string[];
-  items: Array<{title: string, note: string, icon: string}>;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-    // If we navigated to this page, we will have an item available as a nav param
-    this.selectedItem = navParams.get('item');
-
-    // Let's populate this page with some filler content for funzies
-    this.icons = ['flask', 'wifi', 'beer', 'football', 'basketball', 'paper-plane',
-    'american-football', 'boat', 'bluetooth', 'build'];
-
-    this.items = [];
-    for (let i = 1; i < 11; i++) {
-      this.items.push({
-        title: 'Item ' + i,
-        note: 'This is item #' + i,
-        icon: this.icons[Math.floor(Math.random() * this.icons.length)]
-      });
-    }
+  staticReports: any = [];
+  constructor(public navCtrl: NavController, public navParams: NavParams,  public viewCtrl: ViewController) {
+    this.addStaticReports();
   }
 
-  itemTapped(event, item) {
-    // That's right, we're pushing to ourselves!
-    this.navCtrl.push(ListPage, {
-      item: item
-    });
+  addStaticReports(){
+    this.staticReports.push({line: '9653-10', direction: 'Pedra Branca - Pça. do Correio', num_car: '11661',description: 'Pneu furado.', hour:'08:00',media_path: '../../assets/imgs/pneu_furado.jpg', type:'image'});
+    this.staticReports.push({line: '9653-10', direction: 'Pedra Branca - Pça. do Correio', num_car: '11661',description: 'Pneu furado.', hour:'08:00',media_path: '../../assets/audio/a1.mp3', type:'audio'});
+    this.staticReports.push({line: '9653-10', direction: 'Pedra Branca - Pça. do Correio', num_car: '11673',description: 'Retrovisor quebrado.', hour:'07:30',media_path: '../../assets/audio/a2.mp3', type:'audio'});
+    this.staticReports.push({line: '9653-10', direction: 'Pedra Branca - Pça. do Correio', num_car: '11661',description: 'Porta não fecha direito, ônibus parou e vamos trocar.', hour:'18:15',media_path: '', type:'text'});
+    this.staticReports.push({line: '9653-10', direction: 'Pedra Branca - Pça. do Correio', num_car: '11673',description: 'Lotação, talvez não dê pra passar.', hour:'06:46', media_path: '', type:'text'});
   }
+
+  closeModal(){
+    this.viewCtrl.dismiss();
+  }
+
+
 }

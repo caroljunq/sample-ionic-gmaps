@@ -14,3 +14,22 @@
 // To declare rules for a specific mode, create a child rule
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
+ion-navbar > .toolbar-background{
+  background: #ef9217 !important;
+}
+
+ion-menu {
+  ion-header{
+    background: #ef9217 !important;
+    padding: 1.5rem;
+  }
+}
+
+ion-menu > div > ion-content > div.scroll-content{
+  overflow: hidden;
+}
+
+#close-menu-button{
+  font-size: 2.25rem;
+  color: #424242;
+}

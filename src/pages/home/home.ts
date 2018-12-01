@@ -1,9 +1,11 @@
-import { NavController, Platform, ViewController } from 'ionic-angular';
+import { NavController, Platform, ViewController, ModalController } from 'ionic-angular';
 import { Component, ElementRef, ViewChild, NgZone } from '@angular/core';
 import { Geolocation } from '@ionic-native/geolocation';
 import { GoogleMapsProvider } from '../../providers/google-maps/google-maps';
+import { RegisterPage } from '../register/register';
+import { ListPage } from '../list/list';
 
-declare var google;
+// declare var google;
 
 @Component({
   selector: 'page-home',
@@ -49,7 +51,26 @@ export class HomePage {
     destinationPosition: {}
   };
 
-  constructor(public navCtrl: NavController, public zone: NgZone, public maps: GoogleMapsProvider, public platform: Platform, public geolocation: Geolocation, public viewCtrl: ViewController) {
+  currentPositionMarker: any;
+
+  staticMarkers = [{
+    lat: -23.469155,
+    lng: -46.662832,
+    name: "Av. Parada Pinto, 780 - Vila Nova Cachoeirinha, São Paulo - SP, 02611-002, Brasil"
+  },
+  {
+    lat: -23.506998,
+    lng: -46.672228,
+    name: "Av. Casa Verde, 3472-3496 - Limão"
+  },
+  {
+    lat: -23.494181,
+    lng: -46.677680,
+    name: "Av. Gaspar Vaz da Cunha, 64-128 - Vila Prado"
+  }
+];
+
+  constructor(public modalCtrl: ModalController, public navCtrl: NavController, public zone: NgZone, public maps: GoogleMapsProvider, public platform: Platform, public geolocation: Geolocation, public viewCtrl: ViewController) {
     this.searchDisabled = true;
     // this.saveDisabled = true;
   }
@@ -62,15 +83,38 @@ export class HomePage {
       this.placesService = new google.maps.places.PlacesService(this.maps.map);
       this.searchDisabled = false;
 
-      this.currentMarker = new google.maps.Marker({ map: this.maps.map });
+      this.addStaticMarkers();
+
+      this.currentPositionMarker = new google.maps.Marker({
+        map: this.maps.map,
+        icon: '/../../assets/icon/gps-marker.png'
+      });
 
       this.showCurrentLocation();
+//
+      this.currentMarker = new google.maps.Marker({
+        map: this.maps.map
+      });
 
       this.directionsService = new google.maps.DirectionsService();
       this.directionsDisplay = new google.maps.DirectionsRenderer();
       this.directionsDisplay.setMap(this.maps.map);
-      // this.displayDirection(this.directionsService, this.directionsDisplay);
     });
+  }
+
+  // implementa dados estáticos (marcadores)
+  addStaticMarkers(){
+    for(let i = 0; i < this.staticMarkers.length; i++){
+      let location = this.staticMarkers[i];
+      let marker = new google.maps.Marker({
+        position: new google.maps.LatLng(location.lat, location.lng),
+        map: this.maps.map
+      });
+      google.maps.event.addListener(marker, 'click', () => {
+        let historyModal = this.modalCtrl.create(ListPage);
+        historyModal.present();
+      });
+    }
   }
 
   searchPlace(option) {
@@ -116,7 +160,6 @@ export class HomePage {
         this.traceRoute = true;
         this.queries[option] = details.formatted_address;
         this.coords_info[option] = details;
-        console.log(this.coords_info);
 
         location.name = details.name;
         location.lat = details.geometry.location.lat();
@@ -138,16 +181,6 @@ export class HomePage {
     });
   }
 
-
-
-  // save() {
-  //   this.viewCtrl.dismiss(this.location);
-  // }
-  //
-  // close() {
-  //   this.viewCtrl.dismiss();
-  // }
-
   getCurrentPosition(){
     return new Promise((resolve, reject) => {
       this.geolocation.getCurrentPosition()
@@ -161,12 +194,18 @@ export class HomePage {
     });
   }
 
+  clearSearchBar(option){
+    // this.traceRoute = false;
+    // this.queries[option] = '';
+  }
+
+
   showCurrentLocation(){
     this.getCurrentPosition()
       .then((resp) =>{
-
         let position = new google.maps.LatLng(resp.coords.latitude, resp.coords.longitude);
 
+        this.currentPositionMarker.setPosition(position);
         this.maps.map.setCenter(position);
         this.maps.map.setZoom(17);
       })
@@ -174,39 +213,6 @@ export class HomePage {
         console.log(err);
       })
   }
-
-  clearSearchBar(option){
-    this.traceRoute = false;
-    this.queries[option] = '';
-  }
-
-
-
-  // calculateRoute() {
-  //
-  //   this.originPosition = new google.maps.LatLng(-21.630483, -48.794094);
-  //   this.destinationPosition = new google.maps.LatLng(-21.615422, -48.812365);
-  //
-  //   if (this.destinationPosition && this.originPosition) {
-  //     const request = {
-  //       // Pode ser uma coordenada (LatLng), uma string ou um lugar
-  //       origin: this.originPosition,
-  //       destination: this.destinationPosition,
-  //       travelMode: 'WALKING'
-  //     };
-  //
-  //     this.traceRoute(this.directionsService, this.directionsDisplay, request);
-  //   }
-  // }
-  //
-  // traceRoute(service: any, display: any, request: any) {
-  //   service.route(request, function(result, status) {
-  //     if (status == 'OK') {
-  //       display.setDirections(result);
-  //     }
-  //   });
-  // }
-
 
   displayDirection() {
     let origin = this.coords_info.originPosition;
@@ -216,11 +222,18 @@ export class HomePage {
     directionsService.route({
       origin: new google.maps.LatLng(origin.geometry.location.lat(), origin.geometry.location.lng()),
       destination: new google.maps.LatLng(destination.geometry.location.lat(), destination.geometry.location.lng()),
-      travelMode: 'WALKING'
+      travelMode: 'TRANSIT'
     }, (response, status) => {
       if (status === 'OK') {
         directionsDisplay.setDirections(response);
       }
     });
+  }
+
+  addAlert(){
+    console.log("Alert added!");
+    let registerModal = this.modalCtrl.create(RegisterPage);
+    registerModal.present();
+    // this.navCtrl.push(RegisterPage);
   }
 }

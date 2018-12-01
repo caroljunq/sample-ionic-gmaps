@@ -3,12 +3,22 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Home</ion-title>
+    <ion-title>Início</ion-title>
   </ion-navbar>
 </ion-header>
 
   <ion-content padding>
-
+  <ion-card>
+    <ion-card-header >
+      <ion-row justify-content-between>
+        <ion-title class="linha">LINHA 9653-10</ion-title>
+        <ion-icon name="star" id="star"></ion-icon>
+      </ion-row>
+    </ion-card-header>
+    <ion-card-content class="sentido">
+      Sentido: Pedra Branca - Pça. do Correio
+    </ion-card-content>
+</ion-card>
   <ion-toolbar>
     <ion-searchbar [(ngModel)]="queries.searchPosition" (ionInput)="searchPlace('searchPosition')" (touchstart)="clearSearchBar('searchPosition')"></ion-searchbar>
   </ion-toolbar>
@@ -21,27 +31,11 @@
     <p>Please connect to the Internet...</p>
   </div>
 
-  <ion-list *ngIf="traceRoute">
-    <ion-toolbar>
-      <ion-searchbar [(ngModel)]="queries.originPosition" (ionInput)="searchPlace('originPosition')" (touchstart)="clearSearchBar('originPosition')"></ion-searchbar>
-    </ion-toolbar>
-    <ion-list style="position: relative;">
-      <ion-item class="place-result" *ngFor="let place of places.originPosition" (touchstart)="selectPlace(place,'originPosition')">{{place.description}}</ion-item>
-    </ion-list>
-
-    <ion-toolbar>
-      <ion-searchbar [(ngModel)]="queries.destinationPosition" (ionInput)="searchPlace('destinationPosition')" (touchstart)="clearSearchBar('destinationPosition')"></ion-searchbar>
-    </ion-toolbar>
-    <ion-list style="position: relative;">
-      <ion-item class="place-result" *ngFor="let place of places.destinationPosition" (touchstart)="selectPlace(place,'destinationPosition')">{{place.description}}</ion-item>
-    </ion-list>
-    <div padding>
-      <button ion-button (click)="displayDirection()">Traçar rota</button>
-    </div>
-  </ion-list>
-
   <div #map id="map">
     <ion-spinner></ion-spinner>
   </div>
+  <ion-row justify-content-center>
+    <ion-icon id="start-button" name="add-circle" (click)="addAlert()"></ion-icon>
+  </ion-row>
 
 </ion-content>

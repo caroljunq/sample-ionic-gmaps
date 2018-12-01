@@ -1,23 +1,32 @@
 <ion-header>
-  <ion-navbar>
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
+  <ion-row>
+    <button id="closeModal" ion-button icon-only (click)="closeModal()">
+      <ion-icon name="close"></ion-icon>
     </button>
-    <ion-title>List</ion-title>
-  </ion-navbar>
+    <ion-title>Histórico</ion-title>
+  </ion-row>
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <button ion-item *ngFor="let item of items" (click)="itemTapped($event, item)">
-      <ion-icon [name]="item.icon" item-start></ion-icon>
-      {{item.title}}
-      <div class="item-note" item-end>
-        {{item.note}}
+  <ion-card ion-item *ngFor="let alert of staticReports">
+    <ion-card-content>
+      <div *ngIf="alert.type == 'audio'">
+        <audio controls>
+          <source src="{{ alert.media_path }}">
+        </audio>
       </div>
-    </button>
-  </ion-list>
-  <div *ngIf="selectedItem" padding>
-    You navigated here from <b>{{selectedItem.title}}</b>
-  </div>
+      <div *ngIf="alert.type == 'image'">
+        <img src="{{ alert.media_path }}"/>
+      </div>
+      <ion-row justify-content-between>
+        <span class="line">Linha: {{alert.line }}</span>
+        <span>Nº Veículo: {{ alert.num_car }}</span>
+      </ion-row>
+      <div>Sentido: {{ alert.direction }}</div>
+      <div>{{ alert.description }}</div>
+      <ion-row justify-content-end>
+        <span style="color: gray;">{{ alert.hour }}</span>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
